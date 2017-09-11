@@ -110,19 +110,25 @@ apiRoutes.post( '/user', function( req, res ){
   var userId = req.body.userId;
   var name = req.body.name;
 
-  var user = {
-    userId: userId,
-    name: name,
-  };
-  client.addUserTx( user, result => {
-    res.write( JSON.stringify( { status: true, result: result }, 2, null ) );
+  if( userId && name ){
+    var user = {
+      userId: userId,
+      name: name,
+    };
+    client.addUserTx( user, result => {
+      res.write( JSON.stringify( { status: true, result: result }, 2, null ) );
+      res.end();
+    }, error => {
+      console.log( error );
+      res.status( 500 );
+      res.write( JSON.stringify( { status: false, message: error }, 2, null ) );
+      res.end();
+    });
+  }else{
+    res.status( 400 );
+    res.write( JSON.stringify( { status: false, message: 'Validation Error' }, 2, null ) );
     res.end();
-  }, error => {
-    console.log( error );
-    res.status( 500 );
-    res.write( JSON.stringify( { status: false, message: error }, 2, null ) );
-    res.end();
-  });
+  }
 });
 
 apiRoutes.post( '/users', function( req, res ){
@@ -219,23 +225,29 @@ apiRoutes.post( '/fileObjs', function( req, res ){
 apiRoutes.post( '/fileObj', function( req, res ){
   var fileObjId = req.body.fileObjId;
   var url = req.body.url;
-  var fileObj = {
-    fileObjId: fileObjId,
-    url: url,
-  };
-  if( req.body.userId ){
-    fileObj.userId = req.body.userId;
-  }
+  if( fileObjId && url ){
+    var fileObj = {
+      fileObjId: fileObjId,
+      url: url,
+    };
+    if( req.body.userId ){
+      fileObj.userId = req.body.userId;
+    }
 
-  client.addFileObjTx( fileObj, result => {
-    res.write( JSON.stringify( { status: true, result: result }, 2, null ) );
-    res.end();
-  }, error => {
+    client.addFileObjTx( fileObj, result => {
+      res.write( JSON.stringify( { status: true, result: result }, 2, null ) );
+      res.end();
+    }, error => {
 console.log( error );
-    res.status( 500 );
-    res.write( JSON.stringify( { status: false, message: error }, 2, null ) );
+      res.status( 500 );
+      res.write( JSON.stringify( { status: false, message: error }, 2, null ) );
+      res.end();
+    });
+  }else{
+    res.status( 400 );
+    res.write( JSON.stringify( { status: false, message: 'Validation Error' }, 2, null ) );
     res.end();
-  });
+  }
 });
 
 

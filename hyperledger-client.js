@@ -309,8 +309,21 @@ const HyperledgerClient = function() {
   vm.queryTransaction = (transactionId, resolved, rejected) => {
     //. Chain クラスの queryTransaction() ?
     //. https://jimthematrix.github.io/Chain.html
+
+    //. TransactionRegistry クラスを利用する
+    //. https://hyperledger.github.io/composer/jsdoc/module-composer-client.TransactionRegistry.html
     vm.prepare(() => {
-      resolved({ transactionId: transactionid });
+      return vm.businessNetworkConnection.getTransactionRegistry()
+      .then(registry => {
+        return registry.get(transactionId);
+      }).then(transaction => {
+        let serializer = vm.businessNetworkDefinition.getSerializer();
+        resolved({ status: true, transaction: serializer.toJSON(transaction) });
+      }).catch(error => {
+        console.log( error );
+        console.log('HyperLedgerClient.queryTransaction(): reject');
+        resolved({ status: false, message: error });
+      });
     }, rejected);
   };
 }
