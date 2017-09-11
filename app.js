@@ -126,7 +126,7 @@ apiRoutes.post( '/user', function( req, res ){
     });
   }else{
     res.status( 400 );
-    res.write( JSON.stringify( { status: false, message: 'Validation Error' }, 2, null ) );
+    res.write( JSON.stringify( { status: false, message: 'userId and name required.' }, 2, null ) );
     res.end();
   }
 });
@@ -180,14 +180,20 @@ apiRoutes.get( '/user', function( req, res ){
 apiRoutes.delete( '/user', function( req, res ){
   var userId = req.body.userId;
 
-  client.deleteUserTx( userId, result => {
-    res.write( JSON.stringify( { status: true }, 2, null ) );
+  if( userId ){
+    client.deleteUserTx( userId, result => {
+      res.write( JSON.stringify( { status: true }, 2, null ) );
+      res.end();
+    }, error => {
+      res.status( 404 );
+      res.write( JSON.stringify( { status: false, message: error }, 2, null ) );
+      res.end();
+    });
+  }else{
+    res.status( 400 );
+    res.write( JSON.stringify( { status: false, message: 'userId required.' }, 2, null ) );
     res.end();
-  }, error => {
-    res.status( 404 );
-    res.write( JSON.stringify( { status: false, message: error }, 2, null ) );
-    res.end();
-  });
+  }
 });
 
 
@@ -225,10 +231,12 @@ apiRoutes.post( '/fileObjs', function( req, res ){
 apiRoutes.post( '/fileObj', function( req, res ){
   var fileObjId = req.body.fileObjId;
   var url = req.body.url;
-  if( fileObjId && url ){
+  var type = req.body.type;
+  if( fileObjId && url && type ){
     var fileObj = {
       fileObjId: fileObjId,
       url: url,
+      type: type
     };
     if( req.body.userId ){
       fileObj.userId = req.body.userId;
@@ -238,14 +246,14 @@ apiRoutes.post( '/fileObj', function( req, res ){
       res.write( JSON.stringify( { status: true, result: result }, 2, null ) );
       res.end();
     }, error => {
-console.log( error );
+      console.log( error );
       res.status( 500 );
       res.write( JSON.stringify( { status: false, message: error }, 2, null ) );
       res.end();
     });
   }else{
     res.status( 400 );
-    res.write( JSON.stringify( { status: false, message: 'Validation Error' }, 2, null ) );
+    res.write( JSON.stringify( { status: false, message: 'fileObjId, url, and type required.' }, 2, null ) );
     res.end();
   }
 });
@@ -254,14 +262,20 @@ console.log( error );
 apiRoutes.delete( '/fileObj', function( req, res ){
   var fileObjId = req.body.fileObjId;
 
-  client.deleteFileObjTx( fileObjId, result => {
-    res.write( JSON.stringify( { status: true }, 2, null ) );
+  if( fileObjId ){
+    client.deleteFileObjTx( fileObjId, result => {
+      res.write( JSON.stringify( { status: true }, 2, null ) );
+      res.end();
+    }, error => {
+      res.status( 404 );
+      res.write( JSON.stringify( { status: false, error: error }, 2, null ) );
+      res.end();
+    });
+  }else{
+    res.status( 400 );
+    res.write( JSON.stringify( { status: false, message: 'fileObjId required.' }, 2, null ) );
     res.end();
-  }, error => {
-    res.status( 404 );
-    res.write( JSON.stringify( { status: false, error: error }, 2, null ) );
-    res.end();
-  });
+  }
 });
 
 apiRoutes.post( '/query', function( req, res ){

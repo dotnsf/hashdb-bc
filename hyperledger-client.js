@@ -104,6 +104,7 @@ const HyperledgerClient = function() {
       //console.log( transaction );
       transaction.fileObjId = fileObj.fileObjId;
       transaction.url = fileObj.url;
+      transaction.type = fileObj.type;
       if( fileObj.userId ){
         transaction.userId = fileObj.userId;
       }
@@ -127,10 +128,12 @@ const HyperledgerClient = function() {
       transaction.fileObjId = [];
       transaction.userId = [];
       transaction.url = [];
+      transaction.type = [];
       for( var i = 0; i < fileObjs.length; i ++ ){
         if( fileObjs[i].fileObjId && fileObjs[i].url ){
           transaction.fileObjId.push( fileObjs[i].fileObjId );
           transaction.url.push( fileObjs[i].url );
+          transaction.type.push( fileObjs[i].type );
           if( fileObjs[i].userId ){
             transaction.userId.push( fileObjs[i].userId );
           }else{
