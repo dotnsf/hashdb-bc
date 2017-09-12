@@ -103,6 +103,7 @@ const HyperledgerClient = function() {
       let transaction = factory.newTransaction(NS, 'addFileObjTx');
       //console.log( transaction );
       transaction.fileObjId = fileObj.fileObjId;
+      transaction.name = fileObj.name;
       transaction.url = fileObj.url;
       transaction.type = fileObj.type;
       if( fileObj.userId ){
@@ -127,11 +128,13 @@ const HyperledgerClient = function() {
       let transaction = factory.newTransaction(NS, 'addFileObjsTx');
       transaction.fileObjId = [];
       transaction.userId = [];
+      transaction.name = [];
       transaction.url = [];
       transaction.type = [];
       for( var i = 0; i < fileObjs.length; i ++ ){
-        if( fileObjs[i].fileObjId && fileObjs[i].url ){
+        if( fileObjs[i].fileObjId && fileObjs[i].name && fileObjs[i].url && fileObjs[i].type ){
           transaction.fileObjId.push( fileObjs[i].fileObjId );
+          transaction.name.push( fileObjs[i].name );
           transaction.url.push( fileObjs[i].url );
           transaction.type.push( fileObjs[i].type );
           if( fileObjs[i].userId ){

@@ -227,9 +227,10 @@ apiRoutes.post( '/fileObjs', function( req, res ){
   if( req.body && req.body.length ){
     for( var i = 0; i < req.body.length; i ++ ){
       var fileObjId = req.body[i].fileObjId;
+      var name = req.body[i].name;
       var url = req.body[i].url;
       var type = req.body[i].type;
-      var fileObj = { fileObjId: fileObjId, url: url, type: type };
+      var fileObj = { fileObjId: fileObjId, name: name, url: url, type: type };
       if( req.body[i].userId ){
         fileObj.userId = req.body[i].userId;
       }
@@ -250,11 +251,13 @@ apiRoutes.post( '/fileObjs', function( req, res ){
 
 apiRoutes.post( '/fileObj', function( req, res ){
   var fileObjId = req.body.fileObjId;
+  var name = req.body.name;
   var url = req.body.url;
   var type = req.body.type;
-  if( fileObjId && url && type ){
+  if( fileObjId && name && url && type ){
     var fileObj = {
       fileObjId: fileObjId,
+      name: name,
       url: url,
       type: type
     };
