@@ -223,9 +223,29 @@ apiRoutes.get( '/fileObj', function( req, res ){
 });
 
 apiRoutes.post( '/fileObjs', function( req, res ){
-  res.status( 501 );
-  res.write( JSON.stringify( { status: false, message: 'Not implemented yet.' }, 2, null ) );
-  res.end();
+  var fileObjs = [];
+  if( req.body && req.body.length ){
+    for( var i = 0; i < req.body.length; i ++ ){
+      var fileObjId = req.body[i].fileObjId;
+      var url = req.body[i].url;
+      var type = req.body[i].type;
+      var fileObj = { fileObjId: fileObjId, url: url, type: type };
+      if( req.body[i].userId ){
+        fileObj.userId = req.body[i].userId;
+      }
+      fileObjs.push( fileObj );
+    }
+  }
+  
+  client.addFileObjsTx( fileObjs, result => {
+    res.write( JSON.stringify( { status: true, result: result }, 2, null ) );
+    res.end();
+  }, error => {
+    console.log( error );
+    res.status( 500 );
+    res.write( JSON.stringify( { status: false, message: error }, 2, null ) );
+    res.end();
+  });
 });
 
 apiRoutes.post( '/fileObj', function( req, res ){
@@ -303,9 +323,31 @@ apiRoutes.get( '/search', function( req, res ){
   });
 });
 
-apiRoutes.get( '/test', function( req, res ){
+apiRoutes.get( '/transaction', function( req, res ){
   var transactionId = req.query.transactionId;
   client.queryTransaction( transactionId, result => {
+    res.write( JSON.stringify( result, 2, null ) );
+    res.end();
+  }, error => {
+    res.status( 403 );
+    res.write( JSON.stringify( error, 2, null ) );
+    res.end();
+  });
+});
+
+apiRoutes.get( '/transactions', function( req, res ){
+  client.queryTransactions( result => {
+    res.write( JSON.stringify( result, 2, null ) );
+    res.end();
+  }, error => {
+    res.status( 403 );
+    res.write( JSON.stringify( error, 2, null ) );
+    res.end();
+  });
+});
+
+apiRoutes.get( '/test', function( req, res ){
+  client.queryEvents( result => {
     res.write( JSON.stringify( result, 2, null ) );
     res.end();
   }, error => {

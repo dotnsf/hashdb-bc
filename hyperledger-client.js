@@ -329,6 +329,51 @@ const HyperledgerClient = function() {
       });
     }, rejected);
   };
+
+  vm.queryTransactions = (resolved, rejected) => {
+    //. TransactionRegistry クラスを利用する
+    //. https://hyperledger.github.io/composer/jsdoc/module-composer-client.TransactionRegistry.html
+    vm.prepare(() => {
+      return vm.businessNetworkConnection.getTransactionRegistry()
+      .then(registry => {
+        return registry.getAll();
+      }).then(transactions => {
+        var result = [];
+        let serializer = vm.businessNetworkDefinition.getSerializer();
+        transactions.forEach( transaction => {
+          result.push( serializer.toJSON( transaction ) );
+        });
+        resolved({ status: true, transactions: result });
+      }).catch(error => {
+        console.log( error );
+        console.log('HyperLedgerClient.queryTransactions(): reject');
+        resolved({ status: false, message: error });
+      });
+    }, rejected);
+  };
+
+  vm.queryEvents = (resolved, rejected) => {
+    vm.prepare(() => {
+      var select = 'SELECT me.juge.hashdb.addUserEvent';
+      var query = vm.businessNetworkConnection.buildQuery( select );
+
+      //. Error: The query compiler does not support resources of this type
+      return vm.businessNetworkConnection.query(query, {})
+      .then(fileObjs => {
+        var result = [];
+        let serializer = vm.businessNetworkDefinition.getSerializer();
+        fileObjs.forEach( fileObj => {
+          result.push( serializer.toJSON(fileObj) );
+        });
+        resolved(result);
+      }).catch(error => {
+        console.log( error );
+        console.log('HyperLedgerClient.queryEvents(): reject');
+        console.log( error );
+        rejected(error);
+      });
+    }, rejected);
+  };
 }
 
 module.exports = HyperledgerClient;
